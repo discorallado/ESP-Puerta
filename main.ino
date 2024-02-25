@@ -1,10 +1,20 @@
 /*
  * Based on circuits4you.com
  */
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+
+#define LED 2
+#define RELAY 14  
+#define BUTTON 7  
+
+const char* deviceName = "door_h0st";
+
+const char* ssid = "SSID";
+const char* password = "PASSWORD";
 
 const char MAIN_page[] PROGMEM = R"=====(
   <!DOCTYPE html>
@@ -78,16 +88,6 @@ IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(8, 8, 8, 8);
 
-
-const char* deviceName = "door_h0st";
-
-#define LED 2
-#define RELAY 14  
-#define BUTTON 7  
-
-const char* ssid = "SSID";
-const char* password = "PASSWORD";
-
 AsyncWebServer server(80);
 
 void handleRoot() {
@@ -98,23 +98,20 @@ void handleRoot() {
 
 void handleLEDon() { 
  Serial.println("open page");
- digitalWrite(LED,LOW); //relay is connected in reverse
- server.send(200, "text/html", "status: OPEN"); //Send ADC value only to client ajax request
+ digitalWrite(LED,LOW);
+ server.send(200, "text/html", "status: OPEN");
 }
 
 void handleLEDoff() { 
  Serial.println("close page");
  digitalWrite(LED,HIGH);
- server.send(200, "text/html", "status: CLOSE"); //Send ADC value only to client ajax request
+ server.send(200, "text/html", "status: CLOSE");
 }
 
-//==============================================================
-//                  SETUP
-//==============================================================
 void setup(void){
   Serial.begin(115200);
   
-  WiFi.begin(ssid, password);     //Connect to your WiFi router
+  WiFi.begin(ssid, password);
   Serial.println("");
 
   //Onboard LED port Direction output
@@ -122,15 +119,13 @@ void setup(void){
   //Power on LED state off
   digitalWrite(LED,HIGH);
 
-  WiFi.disconnect();  //Prevent connecting to wifi based on previous configuration
+  WiFi.disconnect();
   
-  WiFi.hostname(deviceName);      // DHCP Hostname (useful for finding device for static lease)
+  WiFi.hostname(deviceName);
   WiFi.config(staticIP, subnet, gateway, dns);
   WiFi.begin(ssid, password);
 
-  WiFi.mode(WIFI_STA); //WiFi mode station (connect to wifi router only
-  
-  // Wait for connection
+  WiFi.mode(WIFI_STA);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -163,5 +158,5 @@ void setup(void){
   server.begin();
 }
 void loop(void){
-  server.handleClient();          //Handle client requests
+  server.handleClient();
 }
