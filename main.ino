@@ -7,9 +7,9 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
-#define LED 2
-#define RELAY 14  
-#define BUTTON 7  
+#define LED D1
+#define RELAY D2  
+#define BUTTON D7  
 
 const char* deviceName = "door_h0st";
 
